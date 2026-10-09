@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GuardianSync - Parent Command Center</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .dashboard {
+            background: #161b22;
+            padding: 25px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            width: 380px;
+            box-sizing: border-box;
+            border: 1px solid #30363d;
+        }
+        h2 { color: #58a6ff; margin-top: 0; font-size: 1.3rem; text-align: center; }
+        p { font-size: 0.82rem; color: #8b949e; text-align: center; margin-bottom: 20px; }
+        
+        .device-card {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 14px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+        .badge {
+            background: rgba(63, 185, 80, 0.15);
+            color: #3fb950;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.75rem;
+        }
+        .btn {
+            background: #1f6feb;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            margin-top: 8px;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #388bfd; }
+        .btn-danger { background: #da3633; }
+        .btn-danger:hover { background: #f85149; }
+
+        .log-box {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: #8b949e;
+            height: 70px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <h2>Parent Command Center</h2>
+        <p>Linked Target: Child's Android Phone</p>
+
+        <div class="device-card">
+            <div class="status-row">
+                <span>Connection Status:</span>
+                <span class="badge" id="conn-status">Online & Synced</span>
+            </div>
+            <div class="status-row">
+                <span>Active App:</span>
+                <strong style="color: #f0f6fc;" id="active-app">Calculator (Disguised)</strong>
+            </div>
+            <div class="status-row">
+                <span>GPS Location:</span>
+                <span style="color: #58a6ff;" id="gps-loc">Cairo, Egypt</span>
+            </div>
+        </div>
+
+        <div class="device-card">
+            <strong style="font-size: 0.9rem; color: #f0f6fc;">Live Remote Controls</strong>
+            <button class="btn" onclick="sendAction('Request Camera Stream')">Stream Front/Back Cam</button>
+            <button class="btn" onclick="sendAction('Listen to Microphone')">Live Audio Feed</button>
+            <button class="btn" onclick="sendAction('Capture Screenshot')">Take Screen Snapshot</button>
+            <button class="btn btn-danger" onclick="sendAction('Lock Target Device')">Lock Device / Exit App</button>
+        </div>
+
+        <div class="device-card" style="margin-bottom: 0;">
+            <strong style="font-size: 0.85rem; color: #f0f6fc;">Activity Log Stream</strong>
+            <div class="log-box" id="log-console">
+                [04:44] Handshake established with target...<br>
+                [04:44] Background service running silently.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function sendAction(actionName) {
+            const consoleBox = document.getElementById('log-console');
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            
+            consoleBox.innerHTML += `<br>[${timeStr}] Command sent: ${actionName}`;
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+            
+            alert('Success! Command dispatched to server queue: ' + actionName);
+        }
+    </script>
+
+</body>
+</html>

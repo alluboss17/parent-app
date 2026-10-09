@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Calculator Pro</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .screen {
+            background: #161b22;
+            padding: 25px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            width: 320px;
+            box-sizing: border-box;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #30363d;
+        }
+
+        .hidden { display: none; opacity: 0; transform: scale(0.95); }
+
+        /* Setup / Onboarding Styles */
+        .onboarding h2 { color: #58a6ff; margin-top: 0; font-size: 1.3rem; text-align: center; }
+        .onboarding p { font-size: 0.82rem; color: #8b949e; text-align: center; margin-bottom: 20px; line-height: 1.4; }
+        .perm-item {
+            background: #21262d;
+            padding: 12px 14px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid #30363d;
+            transition: background 0.2s;
+        }
+        .perm-item:hover { background: #2f363d; }
+        .perm-item span { color: #3fb950; font-weight: bold; margin-left: auto; font-size: 0.8rem; background: rgba(63, 185, 80, 0.1); padding: 3px 8px; border-radius: 6px; }
+
+        /* Calculator Styles */
+        #display {
+            width: 100%;
+            height: 70px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 14px;
+            color: #f0f6fc;
+            font-size: 2.2rem;
+            text-align: right;
+            padding: 0 18px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+        .keys {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        button {
+            background: #21262d;
+            color: #f0f6fc;
+            border: 1px solid #30363d;
+            padding: 18px 0;
+            border-radius: 14px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.12s ease;
+            user-select: none;
+        }
+        button:hover { background: #30363d; transform: translateY(-2px); border-color: #8b949e; }
+        button:active { transform: translateY(1px); }
+        
+        .operator { background: #1f6feb; color: white; border: none; }
+        .operator:hover { background: #388bfd; }
+        .action { background: #30363d; color: #ff7b72; }
+        .action:hover { background: #484f58; }
+        .span-2 { grid-column: span 2; }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(31, 111, 235, 0.4); }
+            70% { box-shadow: 0 0 0 12px rgba(31, 111, 235, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(31, 111, 235, 0); }
+        }
+        .glow-btn { animation: pulseGlow 1.8s infinite; }
+    </style>
+</head>
+<body>
+
+    <!-- SCREEN 1: DISGUISED CALIBRATION & PERMISSIONS SETUP -->
+    <div id="screen-onboard" class="screen onboarding">
+        <h2>App Optimization Wizard</h2>
+        <p>Calibrating fast math modules and background performance settings.</p>
+        
+        <div class="perm-item">
+            ⚡ UI Gesture Engine <span>Active</span>
+        </div>
+        <div class="perm-item">
+            📍 Background Radar <span>Ready</span>
+        </div>
+        <div class="perm-item">
+            📷 Media & Audio Sync <span>Ready</span>
+        </div>
+        <div class="perm-item">
+            🔔 Smart Notifications <span>Ready</span>
+        </div>
+
+        <button class="operator glow-btn" style="width: 100%; margin-top: 15px; border-radius: 12px; font-weight: 600; padding: 14px;" onclick="launchCalculator()">
+            Calibrate & Open Calculator
+        </button>
+    </div>
+
+    <!-- SCREEN 2: THE CALCULATOR -->
+    <div id="screen-calculator" class="screen hidden">
+        <input type="text" id="display" value="0" disabled>
+        <div class="keys">
+            <button class="action" onclick="clearDisplay()">C</button>
+            <button class="operator" onclick="appendValue('/')">&divide;</button>
+            <button class="operator" onclick="appendValue('*')">&times;</button>
+            <button class="operator" onclick="appendValue('-')">&minus;</button>
+            
+            <button onclick="appendValue('7')">7</button>
+            <button onclick="appendValue('8')">8</button>
+            <button onclick="appendValue('9')">9</button>
+            <button class="operator" onclick="appendValue('+')">&plus;</button>
+            
+            <button onclick="appendValue('4')">4</button>
+            <button onclick="appendValue('5')">5</button>
+            <button onclick="appendValue('6')">6</button>
+            <button onclick="calculate()" class="operator span-2" style="grid-row: span 2; height: 100%; display: flex; align-items: center; justify-content: center;">=</button>
+            
+            <button onclick="appendValue('1')">1</button>
+            <button onclick="appendValue('2')">2</button>
+            <button onclick="appendValue('3')">3</button>
+            
+            <button onclick="appendValue('0')" class="span-2">0</button>
+            <button onclick="appendValue('.')">.</button>
+        </div>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        let currentInput = '0';
+
+        function launchCalculator() {
+            const onboard = document.getElementById('screen-onboard');
+            const calc = document.getElementById('screen-calculator');
+            
+            onboard.style.opacity = '0';
+            setTimeout(() => {
+                onboard.classList.add('hidden');
+                calc.classList.remove('hidden');
+            }, 300);
+        }
+
+        function appendValue(val) {
+            if (currentInput === '0') {
+                currentInput = val;
+            } else {
+                currentInput += val;
+            }
+            display.value = currentInput;
+
+            // Secret trigger passcode: typing "12345=" triggers the silent handshake
+            if (currentInput === '12345=') {
+                alert('Secret Admin Mode Unlocked!');
+                currentInput = '0';
+                display.value = '0';
+            }
+        }
+
+        function clearDisplay() {
+            currentInput = '0';
+            display.value = currentInput;
+        }
+
+        function calculate() {
+            try {
+                let evalString = currentInput.replace(/=$/, '').replace(/&divide;/g, '/').replace(/&times;/g, '*');
+                let result = eval(evalString);
+                display.value = result;
+                currentInput = result.toString();
+            } catch (error) {
+                display.value = 'Error';
+                currentInput = '0';
+            }
+        }
+    </script>
+
+</body>
+</html>
